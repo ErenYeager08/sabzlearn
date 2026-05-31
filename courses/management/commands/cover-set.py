@@ -12,23 +12,20 @@ class Command(BaseCommand):
     
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
-        # لیست آدرس تصاویر کاور (دقیقاً همون مسیرهایی که گفتی)
         self.cover_images = ['cover1.webp', 'cover2.webp', 'cover3.webp']
     
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS('🖼️ شروع فرآیند تنظیم کاور دوره‌ها...'))
+        self.stdout.write(self.style.SUCCESS('🖼️ start set cover seti...'))
         
-        # گرفتن همه دوره‌ها
         courses = Course.objects.all()
         total_courses = courses.count()
         
         if total_courses == 0:
-            self.stdout.write(self.style.WARNING('⚠️ هیچ دوره‌ای در دیتابیس وجود ندارد!'))
+            self.stdout.write(self.style.WARNING('⚠️ nothing course in data base!'))
             return
         
-        self.stdout.write(self.style.SUCCESS(f'📚 {total_courses} دوره پیدا شد.'))
+        self.stdout.write(self.style.SUCCESS(f'📚 {total_courses} find course'))
         
-        # بررسی کن ببینیم مدل چه فیلدی داره
         course_fields = [f.name for f in Course._meta.get_fields()]
         image_field = None
         
@@ -42,8 +39,8 @@ class Command(BaseCommand):
         elif 'course_image' in course_fields:
             image_field = 'course_image'
         else:
-            self.stdout.write(self.style.ERROR(f'❌ فیلد تصویر در مدل Course پیدا نشد!'))
-            self.stdout.write(self.style.WARNING(f'فیلدهای موجود: {", ".join(course_fields)}'))
+            self.stdout.write(self.style.ERROR(f'❌ image field in Course not found'))
+            self.stdout.write(self.style.WARNING(f'currnet course: {", ".join(course_fields)}'))
             return
         
         self.stdout.write(self.style.SUCCESS(f'✅ از فیلد "{image_field}" استفاده میشود.'))
@@ -59,7 +56,7 @@ class Command(BaseCommand):
                 
                 # بررسی وجود فایل
                 if not os.path.exists(image_path):
-                    self.stdout.write(self.style.WARNING(f'⚠️ فایل {selected_image} در مسیر {image_path} وجود ندارد'))
+                    self.stdout.write(self.style.WARNING(f'⚠️ file {selected_image} in path {image_path} not exist'))
                     failed += 1
                     continue
                 
@@ -77,12 +74,12 @@ class Command(BaseCommand):
                 
             except Exception as e:
                 failed += 1
-                self.stdout.write(self.style.ERROR(f'❌ خطا برای دوره {course.title}: {str(e)}'))
+                self.stdout.write(self.style.ERROR(f'❌ warning for course {course.title}: {str(e)}'))
         
         # گزارش نهایی
         self.stdout.write(self.style.SUCCESS('\n' + '='*50))
-        self.stdout.write(self.style.SUCCESS(f'✅ عملیات با موفقیت به پایان رسید!'))
-        self.stdout.write(self.style.SUCCESS(f'📸 موفق: {successful} دوره'))
+        self.stdout.write(self.style.SUCCESS(f'✅ finish op with success'))
+        self.stdout.write(self.style.SUCCESS(f'📸 succsess: {successful} course'))
         if failed > 0:
-            self.stdout.write(self.style.WARNING(f'⚠️ ناموفق: {failed} دوره'))
+            self.stdout.write(self.style.WARNING(f'⚠️ failed: {failed} course'))
         self.stdout.write(self.style.SUCCESS('='*50))
