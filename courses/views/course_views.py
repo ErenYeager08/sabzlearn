@@ -6,8 +6,7 @@ from core.permissons import IsInstructor
 from django.db.models import Q
 from rest_framework.decorators import action
 
-# تستی
-# در views.py اضافه کن
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
@@ -45,6 +44,8 @@ class CourseListView(generics.ListAPIView):
         return queryset
 
 from django.db.models import Prefetch
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class CourseDetailView(generics.RetrieveAPIView):
     """جزییات یک دوره"""
     serializer_class = CourseDetailSerializer
@@ -56,7 +57,8 @@ class CourseDetailView(generics.RetrieveAPIView):
             Prefetch('comment_set', queryset=Comment.objects.select_related('user').order_by('-created_at'))
         )
     
-
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class InstructorCourseListView(generics.ListCreateAPIView):
     """لیست دوره‌های مدرس (و ایجاد دوره جدید)"""
     permission_classes = [permissions.IsAuthenticated, IsInstructor]
@@ -72,6 +74,8 @@ class InstructorCourseListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class InstructorCourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     """مدیریت یک دوره توسط مدرس"""
     permission_classes = [permissions.IsAuthenticated, IsInstructor]

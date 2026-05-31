@@ -6,6 +6,12 @@ from ..models import Course, Enrollment, Video
 from ..api.serializers import EnrollmentSerializer
 from core.permissons import IsStudent
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class EnrollCourseView(APIView):
     """ثبت‌نام در دوره (خرید دوره)"""
     permission_classes = [permissions.IsAuthenticated, IsStudent]
@@ -30,6 +36,8 @@ class EnrollCourseView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class VideoStreamView(APIView):
     """دریافت اطلاعات ویدیو برای پخش"""
     permission_classes = [permissions.AllowAny]
@@ -70,6 +78,8 @@ class VideoStreamView(APIView):
             'course_slug': course.slug,
         })
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class CourseContentAccessView(APIView):
     """دسترسی به محتوای دوره (بررسی ثبت‌نام یا رایگان بودن)"""
     permission_classes = [permissions.IsAuthenticated]
@@ -99,6 +109,8 @@ class CourseContentAccessView(APIView):
             'is_free': False
         })
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class MyCoursesView(generics.ListAPIView):
     """دوره‌هایی که دانشجو خریداری کرده"""
     permission_classes = [permissions.IsAuthenticated, IsStudent]

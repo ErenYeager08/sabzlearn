@@ -6,6 +6,12 @@ from ..models import Enrollment, VideoProgress, Video
 from ..api.serializers import VideoProgressSerializer
 from core.permissons import IsStudent
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(vary_on_headers('Authorization'), name='dispatch')
 class UpdateVideoProgressView(APIView):
     """بروزرسانی پیشرفت تماشای ویدیو"""
     permission_classes = [permissions.IsAuthenticated, IsStudent]
